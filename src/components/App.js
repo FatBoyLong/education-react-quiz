@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from 'react';
+
 import Header from './Header';
 import Main from './Main';
 import Loader from './Loader';
@@ -7,6 +8,11 @@ import StartScreen from './StartScreen';
 import Question from './Question';
 import NextButton from './NextButton';
 import Progress from './Progress';
+import FinishScreen from './FinishScreen';
+import Timer from './Timer';
+import Footer from './Footer';
+
+const SECS_PER_QUESTION = 30;
 
 const initialState = {
   questions: [],
@@ -24,6 +30,12 @@ const initialState = {
 
   // handling user score
   points: 0,
+
+  // handling user highscore
+  highscore: 0,
+
+  // seconds of timer
+  secondsRemaining: null,
 };
 
 function reducer(state, action) {
@@ -37,7 +49,11 @@ function reducer(state, action) {
 
     // handling click on button Let`s start!
     case 'start':
-      return { ...state, status: 'active' };
+      return {
+        ...state,
+        status: 'active',
+        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
+      };
 
     // handling user answer (choosing answer of 4 questions)
     case 'newAnswer':
@@ -59,6 +75,28 @@ function reducer(state, action) {
     case 'nextQuestion':
       return { ...state, questionIndex: state.questionIndex + 1, answer: null };
 
+    case 'finished':
+      return {
+        ...state,
+        status: 'finished',
+        highscore:
+          state.points > state.highscore ? state.points : state.highscore,
+      };
+
+    case 'restart':
+      return {
+        ...initialState,
+        questions: state.questions,
+        status: 'ready',
+      };
+
+    case 'tick':
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining === 0 ? 'finished' : state.status,
+      };
+
     default:
       throw new Error('Unknown action');
   }
@@ -67,7 +105,15 @@ function reducer(state, action) {
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const { questions, status, questionIndex, answer, points } = state;
+  const {
+    questions,
+    status,
+    questionIndex,
+    answer,
+    points,
+    highscore,
+    secondsRemaining,
+  } = state;
 
   const numQuestions = questions.length;
 
@@ -75,7 +121,6 @@ function App() {
     (acc, question) => acc + question.points,
     0
   );
-  
 
   useEffect(function () {
     fetch('http://localhost:9000/questions')
@@ -107,8 +152,24 @@ function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton dispatch={dispatch} answer={answer} />
+            <Footer>
+              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                numQuestions={numQuestions}
+                questionIndex={questionIndex}
+              />
+            </Footer>
           </>
+        )}
+        {status === 'finished' && (
+          <FinishScreen
+            points={points}
+            maximumPoints={maximumPoints}
+            highscore={highscore}
+            dispatch={dispatch}
+          />
         )}
       </Main>
     </div>
