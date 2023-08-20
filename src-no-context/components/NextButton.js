@@ -1,9 +1,4 @@
-import { useQuestions } from '../contexts/QuestionsContext';
-
-function NextButton() {
-  const { dispatch, answer, questionIndex, numQuestions } = useQuestions(
-    
-  );
+function NextButton({ dispatch, answer, questionIndex, numQuestions }) {
   if (questionIndex < numQuestions - 1) {
     return (
       answer !== null && (

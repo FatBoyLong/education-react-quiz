@@ -1,10 +1,13 @@
+import { useQuestions } from '../contexts/QuestionsContext';
 import Options from './Options';
 
-function Question({ question, dispatch, answer }) {
+function Question() {
+  const { questions, questionIndex } = useQuestions();
+
   return (
     <div>
-      <h4>{question.question}</h4>
-      <Options question={question} dispatch={dispatch} answer={answer} />
+      <h4>{questions[questionIndex].question}</h4>
+      <Options />
     </div>
   );
 }

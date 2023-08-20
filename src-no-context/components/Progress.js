@@ -1,9 +1,10 @@
-import { useQuestions } from '../contexts/QuestionsContext';
-
-function Progress() {
-  const { questionIndex, numQuestions, points, maximumPoints, answer } =
-    useQuestions();
-
+function Progress({
+  questionIndex,
+  numQuestions,
+  points,
+  maximumPoints,
+  answer,
+}) {
   return (
     <header className="progress">
       {/* for filling progress bar immediately, we should plus 1 to value of bar (value is index of question)*/}

@@ -1,12 +1,5 @@
-import { useQuestions } from '../contexts/QuestionsContext';
-
-function Options() {
-  const { questions, questionIndex, dispatch, answer } = useQuestions();
-
+function Options({ question, dispatch, answer }) {
   const hasAnswered = answer !== null;
-
-  const question = questions[questionIndex];
-  console.log(question);
 
   return (
     <div className="options">
